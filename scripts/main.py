@@ -26,17 +26,21 @@ def main():
 
     print("\nTraining Ridge Regression on full preprocessed data...")
     ridge_model = trained_ridge_model(x_train, y_train)
+    print("\nRidge Regression Trained")
 
     #rf_model = trained_rf_model(x_train, y_train)
 
     print("\nTraining GBM on full preprocessed data...")
     gbm_model = trained_gbm_model(x_train, y_train)
+    print("\nGBM Trained")
 
     print("\nTraining XGBoost on full preprocessed data...")
     xgb_model = trained_xgb_model(x_train, y_train)
+    print("\nXGBoost Trained")
 
     print("\nTraining Tensorflow on full preprocessed data...")
     tf_model = trained_tf_dn_model(x_train, y_train)
+    print("\nTensorflow Trained")
 
     # Get model predictions and add back to x_train for stacked model predictions
     x_train_stacked = x_train.copy()
