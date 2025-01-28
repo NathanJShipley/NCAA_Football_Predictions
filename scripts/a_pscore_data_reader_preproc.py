@@ -58,10 +58,9 @@ def read_and_process_data(train_path: str, test_path: str, pos_team_dum_code: bo
 
     # Handle dummy coding of 'pos_team' if required
     if pos_team_dum_code:
-        # Just going to dummy code for now
-        x_train_encoded = pd.get_dummies(x_train, columns=['pos_team'], drop_first=True)
-        x_test_encoded = pd.get_dummies(x_test, columns=['pos_team'], drop_first=True)
-
+        # Dummy code and convert boolean dummies to integers
+        x_train_encoded = pd.get_dummies(x_train, columns=['pos_team'], drop_first=True).astype(int)
+        x_test_encoded = pd.get_dummies(x_test, columns=['pos_team'], drop_first=True).astype(int)
     else:
         # Keep the original data without dummy coding
         x_train_encoded = x_train.copy()
@@ -76,6 +75,16 @@ def read_and_process_data(train_path: str, test_path: str, pos_team_dum_code: bo
 
     # Re-align columns in x_test_encoded to match the order of x_train_encoded
     x_test_encoded = x_test_encoded[x_train_encoded.columns]
+
+    # Convert all boolean columns to integers (True -> 1, False -> 0) using the 'astype' method for the entire dataframe
+    bool_cols = x_train_encoded.select_dtypes(include=['bool']).columns  # Identify boolean columns
+    x_train_encoded[bool_cols] = x_train_encoded[bool_cols].astype(int)  # Convert them to int
+    x_test_encoded[bool_cols] = x_test_encoded[bool_cols].astype(int)
+
+    # Verify the data types to ensure all booleans are now integers
+    print("Data types for x_train after conversion:", x_train_encoded.dtypes.value_counts())
+    print("Data types for x_test after conversion:", x_test_encoded.dtypes.value_counts())
+
 
     # Check this when building out the model
     print("train data has shape:", x_train_encoded.shape)  # Expected output should be (num_samples, 18874 samples and 503 columns
