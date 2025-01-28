@@ -6,27 +6,36 @@ from e_pscore_GBM_model import trained_gbm_model
 from f_pscore_xgb_model import trained_xgb_model
 from g_pscore_tf_dn_model import trained_tf_dn_model
 from sklearn.linear_model import LinearRegression
+import joblib
+
+
+
 
 def main():
     # Set the paths and if I want to dummy code the POS_Team variable
     # Also f means the full data, pull in the selected and full data
-    train_path = r"E:\github_repos\Private_Projects\NCAA_FBS_AP_Ranking_Predictions\python_ap\scripts_and_data\data\score_pred_train_data.csv"
-    test_path = r"E:\github_repos\Private_Projects\NCAA_FBS_AP_Ranking_Predictions\python_ap\scripts_and_data\data\score_pred_test_data.csv"
+    train_path = r"E:\github_repos\PRIVATE\Private_Active_Projects\_old\NCAA_FBS_AP_Ranking_Predictions\python_ap\scripts_and_data\data\score_pred_train_data.csv"
+    test_path = r"E:\github_repos\PRIVATE\Private_Active_Projects\_old\NCAA_FBS_AP_Ranking_Predictions\python_ap\scripts_and_data\data\score_pred_test_data.csv"
 
     print("Preprocessing selected data with dummy code for POS Team...")
-    x_train, y_train, x_test, y_test, team_values = read_and_process_data(train_path, test_path, True)
+    x_train, y_train, x_test, y_test, train_original_test_columns, test_original_test_columns = read_and_process_data(train_path, test_path, True)
 
     print("\nTraining Linear Regression on full preprocessed data...")
     lr_model = trained_linear_regression(x_train, y_train)
+    print("\nLinear Regression Trained")
 
+    print("\nTraining Ridge Regression on full preprocessed data...")
     ridge_model = trained_ridge_model(x_train, y_train)
 
     #rf_model = trained_rf_model(x_train, y_train)
 
+    print("\nTraining GBM on full preprocessed data...")
     gbm_model = trained_gbm_model(x_train, y_train)
 
+    print("\nTraining XGBoost on full preprocessed data...")
     xgb_model = trained_xgb_model(x_train, y_train)
 
+    print("\nTraining Tensorflow on full preprocessed data...")
     tf_model = trained_tf_dn_model(x_train, y_train)
 
     # Get model predictions and add back to x_train for stacked model predictions
@@ -65,6 +74,11 @@ def main():
 
     # now fit
     lm_stacked.fit(x_train_stacked, y_train)
+
+    # Save the stacked model
+    model_save_path = r"E:\github_repos\PUBLIC\NCAA_Football_Predictions\model\stacked_model.joblib"
+    joblib.dump(lm_stacked, model_save_path)
+    print(f"Stacked model saved to: {model_save_path}")
 
     return lm_stacked
 
